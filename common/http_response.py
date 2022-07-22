@@ -20,7 +20,7 @@ class HttpResponse(Response):
 
     @classmethod
     def response_success(cls, message='', data=None):
-        return HttpResponse(HTTP_200_OK, message=message, results=data,status=HTTP_200_OK)
+        return HttpResponse(HTTP_200_OK, message=message, results=data, status=HTTP_200_OK)
 
     @classmethod
     def response_failed(cls, message='', data=None):

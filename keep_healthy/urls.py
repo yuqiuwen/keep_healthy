@@ -24,11 +24,18 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path(r'users/', include('users.urls')),
     path(r'diabetes/', include('diabetes.urls')),
-    re_path(r'media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT})
+    path(r'source/', include('source_data.urls')),
+    re_path(r'media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    re_path('^static/(?P<path>.*)$', serve, {'document_root': settings.STATICFILES_DIRS}, name='static')
 ]
 
 
 from keep_healthy.settings import DEBUG
 
 if DEBUG:
+    import debug_toolbar
     urlpatterns.append(re_path(r'media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}))
+    urlpatterns = [
+                      path('__debug__/', include(debug_toolbar.urls)),
+                      re_path(r'media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT})
+                  ] + urlpatterns

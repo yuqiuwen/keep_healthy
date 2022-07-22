@@ -17,6 +17,19 @@ import platform
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
+if platform == 'windows':
+    pass
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -28,9 +41,27 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost', 'www.health.com', '47.98.97.198']
 
+# todo 调试工具栏配置
+INTERNAL_IPS = [
+    '0.0.0.0',
+    '127.0.0.1',
+    'localhost'
+]
+
+DEBUG_TOOLBAR_PANELS = [
+    'debug_toolbar.panels.timer.TimerPanel',
+    'debug_toolbar.panels.headers.HeadersPanel',
+    'debug_toolbar.panels.request.RequestPanel',
+    'debug_toolbar.panels.sql.SQLPanel',
+    'debug_toolbar.panels.cache.CachePanel',
+    'debug_toolbar.panels.logging.LoggingPanel',
+]
+
 # Application definition
 
 INSTALLED_APPS = [
+    'django_extensions',
+    'debug_toolbar',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,11 +72,13 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework.authtoken',
     'diabetes',
+    'source_data',
     'users.apps.UserConfig',
     'django_celery_results',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -54,6 +87,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'keep_healthy.urls'
@@ -90,6 +124,10 @@ DATABASES = {
     }
 }
 
+from mongoengine import connect
+connect('spider_data', host='localhost', port=27017)
+# AUTHENTICATION_BACKENDS = ('mongoengine.django.auth.MongoEngineBackend',)
+
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -121,18 +159,7 @@ USE_L10N = True
 
 USE_TZ = False
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
-if platform == 'windows':
-    pass
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
-]
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -259,7 +286,8 @@ CORS_ORIGIN_WHITELIST = ( # 设置白名单
     'http://127.0.0.1:8080',
     'http://localhost:8082',
     'http://47.98.97.198:8080',
-    'http://47.98.97.198:8082'
+    'http://47.98.97.198:8082',
+    'https://restapi.amap.com'
 )
 CORS_ALLOW_METHODS = ( # 设置请求方法
     'DELETE',

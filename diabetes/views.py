@@ -1,5 +1,7 @@
 import datetime
 import os, sys
+
+from django.db.models import Q, F, Count, Max, Avg
 from sklearn.metrics import classification_report,accuracy_score,recall_score,roc_auc_score
 import pandas as pd
 
@@ -39,7 +41,7 @@ get:
 update:
     diabetes = Diabetes.objects.get(user=1, is_active=True)
     #instance要更新的对象，partial默认false(需包含所有字段),设置为true表示局部修改
-    s = DiabetesModelSerializer(instance=d, data=request.data, partial=False)   
+    s = DiabetesModelSerializer(instance=diabetes, data=request.data, partial=False)   
     s.save()
 
 delete:
@@ -49,6 +51,8 @@ delete:
 
 
 threadPool = ThreadPoolExecutor(max_workers=4, thread_name_prefix="diabetes_predict_")
+
+
 class DiabetesViewSet(ModelViewSet):
 
     queryset = Diabetes.objects.all()
@@ -102,9 +106,9 @@ class DiabetesViewSet(ModelViewSet):
     def load_pred_model(self, data, fields):
         """
         加载模型
-        @param qs: queryset
+        @param data: queryset
         @param fields: columns
-        @return:
+        @return: result
         """
         try:
             # df = read_frame(qs=data, coerce_float=True, fieldnames=fields)
